@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express()
 const port = 3000
-
+app.use(express.json());
 
 app.get('/',(req,res)=>{
     res.send("hello wold!")
@@ -40,7 +40,7 @@ app.post("/user",(req,res)=>{
 
     if (!title){
         return res.json({
-            message: " ",
+            message: "Title is required ",
 
         });
     }
@@ -51,12 +51,61 @@ app.post("/user",(req,res)=>{
         completed: false,
     };
 
+
     users.push(newUser);
-    res.status(201).jason({
+    res.status(201).json({
         message: "User created sucessfully",
         todo: newUser,
     });
 
+});
+
+// update todo
+app.put("/user/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  const user = users.find((user) => user.id === id);
+
+  if (!user) {
+    return res.json({
+      message: "User not found",
+    });
+  }
+
+  const { title, completed } = req.body;
+
+  if (title !== undefined) {
+    user.title = title;
+  }
+
+  if (completed !== undefined) {
+    user.completed = completed;
+  }
+
+  res.json({
+    message: "User updated successfully",
+    user: user,
+  });
+});
+
+// DELETE todo
+app.delete("/user/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  const userIndex = users.findIndex((todo) => todo.id === id);
+
+  if (userIndex === -1) {
+    return res.status(404).json({
+      message: "Todo not found",
+    });
+  }
+
+  const deletedUser = users.splice(userIndex, 1);
+
+  res.json({
+    message: "User deleted successfully",
+    todo: deletedUser[0],
+  });
 });
 
 
